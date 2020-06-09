@@ -1,6 +1,6 @@
 const mongoose = require("mongoose"); //몽고스를 불러옴
 
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
   name: {
     type: String,
     maxlength: 50,
