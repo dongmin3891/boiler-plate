@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     maxlength: 50,
   },
-  emil: {
+  email: {
     type: String,
     trim: true, //만약에 dong min@naver.com 이렇게 했을 때 스페이스가 있다 trim은 이 스페이스를 없애준다.
     unique: 1, // 중복방지
