@@ -1,8 +1,9 @@
 const express = require("express"); //express모듈를 가져온다
 const app = express(); //express의 펑션을 가지고 새로운 express app을 만들고
 const port = 5000; // 아무렇게나 해도 된다.
-
 const bodyParser = require("body-parser");
+
+const config = require("./config/key");
 
 const { User } = require("./models/User");
 
@@ -15,7 +16,8 @@ app.use(bodyParser.json());
 const mongoose = require("mongoose");
 mongoose
   .connect(
-    "mongodb+srv://Dongmin:qwe9093265!@boilerplate-fi1w3.mongodb.net/<dbname>?retryWrites=true&w=majority",
+    config.mongoURI,
+
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
