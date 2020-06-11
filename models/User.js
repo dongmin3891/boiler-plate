@@ -1,4 +1,6 @@
 const mongoose = require("mongoose"); //몽고스를 불러옴
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -30,6 +32,25 @@ const userSchema = new mongoose.Schema({
     type: Number,
   }, //토큰이 사용할 수 있는 기간을 주는 것
 });
+
+userSchema.pre("save", function (next) {
+  var user = this;
+
+  if (user.isModified("password")) {
+    //비밀번호를 암호화 시킨다.
+    bcrypt.genSalt(saltRounds, function (err, salt) {
+      if (err) return next(err);
+
+      bcrypt.hash(user.password, salt, function (err, hash) {
+        if (err) return next(err);
+        user.password = hash;
+        next();
+      });
+      // Store hash in your password DB.
+    });
+  }
+});
+
 // 그 다음 이 스키마를 모델로 감싸준다고 하였다.
 const User = mongoose.model("User", userSchema);
 //'User'에는 이 모델의 이름을 적어주고 그 오른쪽은 스키마 이름을 가져오면 된다.
