@@ -48,6 +48,8 @@ userSchema.pre("save", function (next) {
       });
       // Store hash in your password DB.
     });
+  } else {
+    next();
   }
 });
 
