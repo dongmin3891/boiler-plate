@@ -1,4 +1,4 @@
-const mongoose = require("mongoose"); //몽고스를 불러옴
+const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const jwt = require("jsonwebtoken");
@@ -36,7 +36,6 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre("save", function (next) {
   var user = this;
-
   if (user.isModified("password")) {
     //비밀번호를 암호화 시킨다.
     bcrypt.genSalt(saltRounds, function (err, salt) {
@@ -47,7 +46,6 @@ userSchema.pre("save", function (next) {
         user.password = hash;
         next();
       });
-      // Store hash in your password DB.
     });
   } else {
     next();
@@ -55,7 +53,7 @@ userSchema.pre("save", function (next) {
 });
 
 userSchema.methods.comparePassword = function (plainPassword, cb) {
-  //plainPassword 45678 암호호된 비밀번호 ﻿$2b$10$KpG8B0EzD.0POXyu.xCUu.3FY60FjHWHMdK/e2BAFZHSpjBqqcBc6
+  //plainPassword 1234567    암호회된 비밀번호 $2b$10$l492vQ0M4s9YUBfwYkkaZOgWHExahjWC
   bcrypt.compare(plainPassword, this.password, function (err, isMatch) {
     if (err) return cb(err);
     cb(null, isMatch);
@@ -64,8 +62,9 @@ userSchema.methods.comparePassword = function (plainPassword, cb) {
 
 userSchema.methods.generateToken = function (cb) {
   var user = this;
+  // console.log('user._id', user._id)
 
-  //jsonwebtoken을 이용해서 token을 생성하기
+  // jsonwebtoken을 이용해서 token을 생성하기
   var token = jwt.sign(user._id.toHexString(), "secretToken");
   // user._id + 'secretToken' = token
   // ->
@@ -80,12 +79,11 @@ userSchema.methods.generateToken = function (cb) {
 
 userSchema.statics.findByToken = function (token, cb) {
   var user = this;
-  //user._id + '' = token
+  // user._id + ''  = token
   //토큰을 decode 한다.
   jwt.verify(token, "secretToken", function (err, decoded) {
     //유저 아이디를 이용해서 유저를 찾은 다음에
-    //클라이언트에서 가져온 token과 db에 보관된 토큰이 일치하는지 확인
-
+    //클라이언트에서 가져온 token과 DB에 보관된 토큰이 일치하는지 확인
     user.findOne({ _id: decoded, token: token }, function (err, user) {
       if (err) return cb(err);
       cb(null, user);
@@ -93,9 +91,6 @@ userSchema.statics.findByToken = function (token, cb) {
   });
 };
 
-// 그 다음 이 스키마를 모델로 감싸준다고 하였다.
 const User = mongoose.model("User", userSchema);
-//'User'에는 이 모델의 이름을 적어주고 그 오른쪽은 스키마 이름을 가져오면 된다.
 
-//이 모델을 다른 파일에서도 쓰고 싶다면?
 module.exports = { User };
